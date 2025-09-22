@@ -9,6 +9,43 @@ import tkinter.messagebox
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas as pdf_canvas
 from reportlab.lib.utils import ImageReader
+import subprocess
+import sys
+
+# Function to install required packages
+def install_package(package):
+    """Installs a single package using pip."""
+    try:
+        subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+    except subprocess.CalledProcessError:
+        tkinter.messagebox.showerror("Installation Error", f"Failed to install package: {package}. Please try running 'pip install {package}' from your terminal.")
+        sys.exit()
+
+# Check for required libraries and install if not found
+try:
+    import customtkinter as ctk
+except ImportError:
+    tkinter.messagebox.showinfo("Missing Package", "The 'customtkinter' package is not found. Attempting to install it now.")
+    install_package("customtkinter")
+    import customtkinter as ctk
+
+try:
+    import qrcode
+except ImportError:
+    tkinter.messagebox.showinfo("Missing Package", "The 'qrcode' package is not found. Attempting to install it now.")
+    install_package("qrcode")
+    import qrcode
+
+try:
+    from reportlab.lib.pagesizes import letter
+    from reportlab.pdfgen import canvas as pdf_canvas
+    from reportlab.lib.utils import ImageReader
+except ImportError:
+    tkinter.messagebox.showinfo("Missing Package", "The 'reportlab' package is not found. Attempting to install it now.")
+    install_package("reportlab")
+    from reportlab.lib.pagesizes import letter
+    from reportlab.pdfgen import canvas as pdf_canvas
+    from reportlab.lib.utils import ImageReader
 
 # Set the appearance mode and color theme
 ctk.set_appearance_mode("System")  # "System", "Dark", "Light"
