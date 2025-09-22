@@ -7,9 +7,11 @@
 /*.exe
 /*.out
 /dist/
+/build/
 
 # Project-specific files
 /links.json
+/linkman.spec
 
 # Python artifacts
 __pycache__/
@@ -21,3 +23,5 @@ __pycache__/
 # IDE and editor files (examples)
 .vscode/
 .idea/
+
+# Other
