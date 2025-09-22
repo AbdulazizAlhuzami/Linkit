@@ -7,7 +7,7 @@ This is a simple, cross-platform desktop application built with Python and Custo
 ```bash
 link_manager/
 ├── links.json           # Stores your links (created automatically)
-├── main.py              # The main application script
+├── linkman.py              # The main application script
 └── requirements.txt     # Lists all necessary dependencies
 ```
 
