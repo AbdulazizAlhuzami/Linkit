@@ -119,7 +119,7 @@ Note: You may need to create a `linkman.entitlements` file with specific permiss
 
 4. The executable file (`linkman`) will be in the `dist/` directory.
 
-### Running the Executable
+### Running the Executable (DOES NOT WORK AT THE MOMENT)
 
 Once the compilation is complete, you can find your platform-specific executable inside the newly created `dist/` folder. Simply double-click the file to run the application without needing to use the command line or have Python installed on the target machine.
 
