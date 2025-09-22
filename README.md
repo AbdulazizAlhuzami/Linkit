@@ -48,7 +48,7 @@ This will install all necessary libraries, including customtkinter, qrcode, and 
     Once the dependencies are installed, you can start the application:
 
     ```bash
-    python main.py
+    python linkman.py
     ```
 
 The app will launch in a new window. It will automatically create a links.json file to save your links.
