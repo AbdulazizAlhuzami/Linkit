@@ -7,7 +7,7 @@ This is a simple, cross-platform desktop application built with Python and Custo
 ```bash
 link_manager/
 ├── links.json           # Stores your links (created automatically)
-├── linkman.py           # The main application script
+├── linkit.py            # The main application script
 └── requirements.txt     # Lists all necessary dependencies
 ```
 
@@ -48,7 +48,7 @@ This will install all necessary libraries, including customtkinter, qrcode, and 
     Once the dependencies are installed, you can start the application:
 
     ```bash
-    python linkman.py
+    python linkit.py
     ```
 
 The app will launch in a new window. It will automatically create a links.json file to save your links.
@@ -76,10 +76,10 @@ pip install pyinstaller
 3. Run the PyInstaller command to create the executable. The `--onefile` flag bundles everything into a single file, and the `--noconsole` flag prevents a console window from popping up when the app runs.
 
     ```bash
-    pyinstaller --onefile --noconsole linkman.py
+    pyinstaller --onefile --noconsole linkit.py
     ```
 
-4. After the command finishes, your executable file (`linkman.exe`) will be in the `dist/` directory inside your `link_manager/` folder.
+4. After the command finishes, your executable file (`linkit.exe`) will be in the `dist/` directory inside your `link_manager/` folder.
 
 **macOS**
 
@@ -94,12 +94,12 @@ pip install pyinstaller
 3. Run the PyInstaller command. The `--onefile` and `--noconsole` flags function the same way as in the Windows command. The `--osx-entitlements` flag is necessary for the app to function correctly on modern macOS versions.
 
     ```bash
-    pyinstaller --onefile --noconsole --osx-entitlements linkman.entitlements linkman.py
+    pyinstaller --onefile --noconsole --osx-entitlements linkit.entitlements linkit.py
     ```
 
-Note: You may need to create a `linkman.entitlements` file with specific permissions if you encounter issues. For a basic app, this is often a placeholder.
+Note: You may need to create a `linkit.entitlements` file with specific permissions if you encounter issues. For a basic app, this is often a placeholder.
 
-4. The executable file (`linkman`) will be located in the `dist/` directory.
+4. The executable file (`linkit`) will be located in the `dist/` directory.
 
 **Linux**
 
@@ -114,10 +114,10 @@ Note: You may need to create a `linkman.entitlements` file with specific permiss
 3. Run the PyInstaller command to create the executable. The `--onefile` and `--noconsole` flags are used here as well.
 
     ```bash
-    pyinstaller --onefile --noconsole linkman.py
+    pyinstaller --onefile --noconsole linkit.py
     ```
 
-4. The executable file (`linkman`) will be in the `dist/` directory.
+4. The executable file (`linkit`) will be in the `dist/` directory.
 
 ### Running the Executable (DOES NOT WORK AT THE MOMENT)
 
