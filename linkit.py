@@ -350,20 +350,33 @@ class UrlManagerFrame(ctk.CTkFrame):
         margin = 50
         y_pos = letter[1] - margin
         qr_size = 120
+        # Horizontal positions for the 3 columns
+        col1_x = margin
+        col2_x = margin + qr_size + 20
+        col3_x = col2_x + qr_size + 20
+        
         c.setFont("Helvetica-Bold", 18)
         c.drawString(margin, y_pos, "QR Codes")
         y_pos -= 30
         
-        for link in selected_links:
+        for i, link in enumerate(selected_links):
+            # Determine the column for the current link
+            col_index = i % 3
+            current_x = margin + col_index * (qr_size + 20)
+            
+            # Move to a new row if starting a new set of 3
+            if col_index == 0 and i > 0:
+                y_pos -= (qr_size + 40)
+            
             # Check for new page
-            required_height = qr_size + 15 + 15
-            if y_pos < margin + required_height:
+            if y_pos < margin + (qr_size + 40):
                 c.showPage()
                 y_pos = letter[1] - margin
                 c.setFont("Helvetica-Bold", 18)
                 c.drawString(margin, y_pos, "QR Codes (cont.)")
                 y_pos -= 30
-            
+                current_x = margin
+
             try:
                 # Generate QR code image
                 qr = qrcode.QRCode(version=1, box_size=5, border=4)
@@ -373,24 +386,28 @@ class UrlManagerFrame(ctk.CTkFrame):
                 img_buffer = io.BytesIO()
                 img.save(img_buffer, "PNG")
 
-                # Draw QR code and make it clickable
-                qr_x, qr_y = margin, y_pos - qr_size
-                c.drawImage(ImageReader(img_buffer), qr_x, qr_y, width=qr_size, height=qr_size)
-                c.linkURL(link['url'], (qr_x, qr_y, qr_x + qr_size, qr_y + qr_size))
+                # Draw QR code
+                qr_y = y_pos - qr_size
+                c.drawImage(ImageReader(img_buffer), current_x, qr_y, width=qr_size, height=qr_size)
 
-                # Draw link name and make it clickable
-                name_x, name_y = margin, y_pos - qr_size - 15
+                # Draw link name (truncated if too long)
                 c.setFont("Helvetica-Bold", 12)
-                c.drawString(name_x, name_y, link['name'])
-                c.linkURL(link['url'], (name_x, name_y, name_x + c.stringWidth(link['name']), name_y + 12)) # 12 is font height
+                name_to_display = link['name']
+                max_width = qr_size
+                if c.stringWidth(name_to_display) > max_width:
+                    while c.stringWidth(name_to_display + "...") > max_width:
+                        name_to_display = name_to_display[:-1]
+                    name_to_display += "..."
+                c.drawString(current_x, qr_y - 15, name_to_display)
 
-                # Draw URL and make it clickable
-                url_x, url_y = margin, name_y - 15
+                # Draw URL (truncated if too long)
                 c.setFont("Helvetica", 8)
-                c.drawString(url_x, url_y, link['url'])
-                c.linkURL(link['url'], (url_x, url_y, url_x + c.stringWidth(link['url']), url_y + 8)) # 8 is font height
-
-                y_pos = url_y - 30 # Move down for the next item
+                url_to_display = link['url']
+                if c.stringWidth(url_to_display) > max_width:
+                    while c.stringWidth(url_to_display + "...") > max_width:
+                        url_to_display = url_to_display[:-1]
+                    url_to_display += "..."
+                c.drawString(current_x, qr_y - 25, url_to_display)
 
             except Exception as e:
                 tkinter.messagebox.showerror("Error", f"Failed to generate QR for {link['name']}: {e}")
@@ -616,19 +633,32 @@ class InventoryManagerFrame(ctk.CTkFrame):
         margin = 50
         y_pos = letter[1] - margin
         qr_size = 120
+        # Horizontal positions for the 3 columns
+        col1_x = margin
+        col2_x = margin + qr_size + 20
+        col3_x = col2_x + qr_size + 20
         c.setFont("Helvetica-Bold", 18)
         c.drawString(margin, y_pos, "Inventory QR Codes")
         y_pos -= 30
 
-        for item in selected_items:
+        for i, item in enumerate(selected_items):
+            # Determine the column for the current link
+            col_index = i % 3
+            current_x = margin + col_index * (qr_size + 20)
+            
+            # Move to a new row if starting a new set of 3
+            if col_index == 0 and i > 0:
+                y_pos -= (qr_size + 40)
+            
             # Check for new page
-            required_height = qr_size + 15 + 15 + 15
-            if y_pos < margin + required_height:
+            if y_pos < margin + (qr_size + 40):
                 c.showPage()
                 y_pos = letter[1] - margin
                 c.setFont("Helvetica-Bold", 18)
                 c.drawString(margin, y_pos, "Inventory QR Codes (cont.)")
                 y_pos -= 30
+                current_x = margin
+                
             try:
                 qr = qrcode.QRCode(version=1, box_size=5, border=4)
                 qr.add_data(item['id'])
@@ -637,32 +667,27 @@ class InventoryManagerFrame(ctk.CTkFrame):
                 img_buffer = io.BytesIO()
                 img.save(img_buffer, "PNG")
 
-                qr_x, qr_y = margin, y_pos - qr_size
-                c.drawImage(ImageReader(img_buffer), qr_x, qr_y, width=qr_size, height=qr_size)
+                qr_y = y_pos - qr_size
+                c.drawImage(ImageReader(img_buffer), current_x, qr_y, width=qr_size, height=qr_size)
 
-                name_x, name_y = margin, y_pos - qr_size - 15
+                # Draw item name (truncated if too long)
                 c.setFont("Helvetica-Bold", 12)
-                c.drawString(name_x, name_y, item['name'])
-                
-                desc_x, desc_y = margin, name_y - 15
-                c.setFont("Helvetica", 8)
-                
-                # Manual word wrap for description
-                text_object = c.beginText(desc_x, desc_y)
-                text_object.setFont("Helvetica", 8)
+                name_to_display = item['name']
                 max_width = qr_size
-                words = item['description'].split()
-                line = ""
-                for word in words:
-                    if len(line) + len(word) + 1 <= 50: # Simple character count wrap
-                        line += " " + word
-                    else:
-                        text_object.textLine(line.strip())
-                        line = word
-                text_object.textLine(line.strip())
-                c.drawText(text_object)
+                if c.stringWidth(name_to_display) > max_width:
+                    while c.stringWidth(name_to_display + "...") > max_width:
+                        name_to_display = name_to_display[:-1]
+                    name_to_display += "..."
+                c.drawString(current_x, qr_y - 15, name_to_display)
                 
-                y_pos = desc_y - 30 # Move down for the next item
+                # Draw description (truncated if too long)
+                c.setFont("Helvetica", 8)
+                desc_to_display = item['description']
+                if c.stringWidth(desc_to_display) > max_width:
+                    while c.stringWidth(desc_to_display + "...") > max_width:
+                        desc_to_display = desc_to_display[:-1]
+                    desc_to_display += "..."
+                c.drawString(current_x, qr_y - 25, desc_to_display)
 
             except Exception as e:
                 tkinter.messagebox.showerror("Error", f"Failed to generate QR for {item['name']}: {e}")
