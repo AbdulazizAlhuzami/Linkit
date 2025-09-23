@@ -17,6 +17,7 @@
 /inventory.json
 /settings.json
 /exported_inventory_pdfs/
+/exported_links.pdf
 
 # Python artifacts
 __pycache__/
