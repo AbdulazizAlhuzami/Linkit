@@ -12,6 +12,7 @@
 # Project-specific files
 /links.json
 /linkman.spec
+/linkit.spec
 
 # Python artifacts
 __pycache__/
