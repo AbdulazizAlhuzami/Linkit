@@ -55,73 +55,38 @@ The app will launch in a new window. It will automatically create a links.json f
 
 ## Compiling an Executable
 
+The easiest way to compile your application into a self-contained executable is by using the **auto-py-to-exe** tool, which provides a user-friendly graphical interface.
+
 **Prerequisites**
 
-Make sure you have followed the steps to set up the project and install the dependencies listed in the **"Getting Started"** section of the original guide. After activating your virtual environment, install PyInstaller:
+Make sure you have followed the steps to set up the project and install the dependencies listed in the **"Getting Started"** section. After activating your virtual environment, install the `auto-py-to-exe` tool:
 
 ```bash
-pip install pyinstaller
+pip install auto-py-to-exe
 ```
 
-- **Windows**
-
-1. Open a **Command Prompt** or **PowerShell** window in the `link_manager/` directory.
-
-2. Activate your virtual environment if it isn't already active:
+1. **Run the GUI:** Open your terminal in the project directory and run the tool by typing:
 
     ```bash
-    .\.venv\Scripts\activate
+    auto-py-to-exe
     ```
 
-3. Run the PyInstaller command to create the executable. The `--onefile` flag bundles everything into a single file, and the `--noconsole` flag prevents a console window from popping up when the app runs.
+2. **Configure the Application:** A graphical window will open. Use the following settings:
 
-    ```bash
-    pyinstaller --onefile --noconsole linkit.py
-    ```
+    - **Script Location:** Browse and select your `linkit.py` file.
 
-4. After the command finishes, your executable file (`linkit.exe`) will be in the `dist/` directory inside your `link_manager/` folder.
+    - **Onefile:** Select the "Onefile" option to create a single executable.
 
-**macOS**
+    - **Icon:** (Optional) If you have an icon file, you can browse and add it here.
 
-1. Open a Terminal window in the `link_manager/` directory.
+    - **Additional Files:** This is the most important part for `customtkinter`. Go to the "Additional Files" section, click "Add Folder," and add the `customtkinter` folder from your Python `site-packages` directory. The destination should be `customtkinter`.
 
-2. Activate your virtual environment if it isn't already active:
+3. **Convert:** Click the blue "Convert .py to .exe" button at the bottom of the window.
 
-    ```bash
-    source .venv/bin/activate
-    ```
+The tool will compile your application, and the final executable will be placed in a new `output` folder.
 
-3. Run the PyInstaller command. The `--onefile` and `--noconsole` flags function the same way as in the Windows command. The `--osx-entitlements` flag is necessary for the app to function correctly on modern macOS versions.
-
-    ```bash
-    pyinstaller --onefile --noconsole --osx-entitlements linkit.entitlements linkit.py
-    ```
-
-Note: You may need to create a `linkit.entitlements` file with specific permissions if you encounter issues. For a basic app, this is often a placeholder.
-
-4. The executable file (`linkit`) will be located in the `dist/` directory.
-
-**Linux**
-
-1. Open a **Terminal** window in the `link_manager/` directory.
-
-2. Activate your virtual environment if it isn't already active:
-
-    ```bash
-    source .venv/bin/activate
-    ```
-
-3. Run the PyInstaller command to create the executable. The `--onefile` and `--noconsole` flags are used here as well.
-
-    ```bash
-    pyinstaller --onefile --noconsole linkit.py
-    ```
-
-4. The executable file (`linkit`) will be in the `dist/` directory.
-
-### Running the Executable (DOES NOT WORK AT THE MOMENT)
-
-Once the compilation is complete, you can find your platform-specific executable inside the newly created `dist/` folder. Simply double-click the file to run the application without needing to use the command line or have Python installed on the target machine.
+### Running the Executable
+Once the compilation is complete, you can find your platform-specific executable inside the newly created `output/` folder. Simply double-click the file to run the application without needing to use the command line or have Python installed on the target machine.
 
 ## ✨ Latest Update Features
 
