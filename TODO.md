@@ -21,6 +21,10 @@ No module named 'customtkinter')
 
 - [ ] Add support for Word, LibreOffice, and Google Docs (import/export). <2025-09-22>
 - [ ] Add Markdown support (import/export).
+- [ ] Add a toolbar with:
+    - [ ] Settings
+        - [ ] Add light/dark theme toggle
+        - [ ] Add adjustable font size
 
 ---
 
