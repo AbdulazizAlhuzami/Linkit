@@ -8,6 +8,7 @@
 /*.out
 /dist/
 /build/
+/output/
 
 # Project-specific files
 /links.json
