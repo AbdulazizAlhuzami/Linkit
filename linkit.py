@@ -94,7 +94,7 @@ class LinkitApp(ctk.CTk):
     def update_widgets_font_size(self):
         self.url_manager_frame.update_font(self.font_size)
         self.inventory_manager_frame.update_font(self.font_size)
-
+        
 class SettingsFrame(ctk.CTkToplevel):
     def __init__(self, master):
         super().__init__(master)
@@ -148,7 +148,7 @@ class SettingsFrame(ctk.CTkToplevel):
 
     def update_font_size(self):
         self.master.update_widgets_font_size()
-        
+
 class UrlManagerFrame(ctk.CTkFrame):
     """Frame for the original URL management features."""
     
@@ -215,6 +215,16 @@ class UrlManagerFrame(ctk.CTkFrame):
         # --- Data Handling ---
         self.links = self.load_links()
         self.display_links()
+        
+    def is_valid_url(self, url):
+        regex = re.compile(
+            r'^(?:http|ftp)s?://'  # http:// or https://
+            r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|'  # domain...
+            r'localhost|'  # localhost...
+            r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'  # ...or ip
+            r'(?::\d+)?'  # optional port
+            r'(?:/?|[/?]\S+)$', re.IGNORECASE)
+        return re.match(regex, url) is not None
 
     def load_links(self):
         if os.path.exists(self.LINKS_FILE):
@@ -235,6 +245,10 @@ class UrlManagerFrame(ctk.CTkFrame):
     def add_or_update_link(self):
         link_name = self.link_entry.get().strip()
         url = self.url_entry.get().strip()
+        if not self.is_valid_url(url):
+            tkinter.messagebox.showwarning("Warning", "The URL format is invalid. Please make sure it starts with http:// or https://")
+            return
+            
         if link_name and url:
             if self.editing_index is not None:
                 self.links[self.editing_index]["name"] = link_name
@@ -333,23 +347,23 @@ class UrlManagerFrame(ctk.CTkFrame):
 
         filename = "exported_links.pdf"
         c = pdf_canvas.Canvas(filename, pagesize=letter)
-        margin, qr_size, h_spacing = 50, 120, 20
+        margin = 50
         y_pos = letter[1] - margin
-
+        qr_size = 120
         c.setFont("Helvetica-Bold", 18)
         c.drawString(margin, y_pos, "QR Codes")
         y_pos -= 30
-
+        
         for link in selected_links:
             # Check for new page
-            required_height = qr_size + 15 + 30 # QR code + name + wrapped URL
+            required_height = qr_size + 15 + 15
             if y_pos < margin + required_height:
                 c.showPage()
                 y_pos = letter[1] - margin
                 c.setFont("Helvetica-Bold", 18)
                 c.drawString(margin, y_pos, "QR Codes (cont.)")
                 y_pos -= 30
-
+            
             try:
                 # Generate QR code image
                 qr = qrcode.QRCode(version=1, box_size=5, border=4)
@@ -373,9 +387,10 @@ class UrlManagerFrame(ctk.CTkFrame):
                 # Draw URL and make it clickable
                 url_x, url_y = margin, name_y - 15
                 c.setFont("Helvetica", 8)
-                c.showURL(link['url'], (url_x, url_y, url_x + qr_size, url_y + 8)) # 8 is font height
+                c.drawString(url_x, url_y, link['url'])
+                c.linkURL(link['url'], (url_x, url_y, url_x + c.stringWidth(link['url']), url_y + 8)) # 8 is font height
 
-                y_pos = url_y - 20 # Move down for the next item
+                y_pos = url_y - 30 # Move down for the next item
 
             except Exception as e:
                 tkinter.messagebox.showerror("Error", f"Failed to generate QR for {link['name']}: {e}")
@@ -598,21 +613,22 @@ class InventoryManagerFrame(ctk.CTkFrame):
             return
         filename = "exported_inventory.pdf"
         c = pdf_canvas.Canvas(filename, pagesize=letter)
-        margin, qr_size, h_spacing = 50, 120, 20
+        margin = 50
         y_pos = letter[1] - margin
+        qr_size = 120
         c.setFont("Helvetica-Bold", 18)
         c.drawString(margin, y_pos, "Inventory QR Codes")
         y_pos -= 30
 
         for item in selected_items:
-            required_height = qr_size + 15 + 30 # QR code + name + wrapped description
+            # Check for new page
+            required_height = qr_size + 15 + 15 + 15
             if y_pos < margin + required_height:
                 c.showPage()
                 y_pos = letter[1] - margin
                 c.setFont("Helvetica-Bold", 18)
                 c.drawString(margin, y_pos, "Inventory QR Codes (cont.)")
                 y_pos -= 30
-
             try:
                 qr = qrcode.QRCode(version=1, box_size=5, border=4)
                 qr.add_data(item['id'])
@@ -627,7 +643,7 @@ class InventoryManagerFrame(ctk.CTkFrame):
                 name_x, name_y = margin, y_pos - qr_size - 15
                 c.setFont("Helvetica-Bold", 12)
                 c.drawString(name_x, name_y, item['name'])
-
+                
                 desc_x, desc_y = margin, name_y - 15
                 c.setFont("Helvetica", 8)
                 
@@ -638,7 +654,7 @@ class InventoryManagerFrame(ctk.CTkFrame):
                 words = item['description'].split()
                 line = ""
                 for word in words:
-                    if c.stringWidth(line + " " + word) < max_width:
+                    if len(line) + len(word) + 1 <= 50: # Simple character count wrap
                         line += " " + word
                     else:
                         text_object.textLine(line.strip())
@@ -646,7 +662,7 @@ class InventoryManagerFrame(ctk.CTkFrame):
                 text_object.textLine(line.strip())
                 c.drawText(text_object)
                 
-                y_pos = desc_y - 20 # Move down for the next item
+                y_pos = desc_y - 30 # Move down for the next item
 
             except Exception as e:
                 tkinter.messagebox.showerror("Error", f"Failed to generate QR for {item['name']}: {e}")
@@ -694,7 +710,7 @@ class InventoryManagerFrame(ctk.CTkFrame):
         qr = qrcode.QRCode(version=1, box_size=10, border=4)
         qr.add_data(qr_data)
         qr.make(fit=True)
-        img = qr.make_image(fill_color=black, back_color=white)
+        img = qr.make_image(fill_color="black", back_color="white")
         img.save(qr_filename)
 
         # 3. Display the single QR code to the user.
@@ -729,20 +745,13 @@ class InventoryManagerFrame(ctk.CTkFrame):
             item_card = ctk.CTkFrame(self.item_list_frame, corner_radius=8)
             item_card.grid(row=i, column=0, padx=10, pady=5, sticky="ew")
             item_card.grid_columnconfigure(1, weight=1)
-            item_card.grid_columnconfigure(2, weight=0)
-
             self.checkbox_vars[item["id"]] = ctk.IntVar(value=0)
             ctk.CTkCheckBox(item_card, text="", variable=self.checkbox_vars[item["id"]]).grid(row=0, column=0, rowspan=2, padx=(10, 0), pady=10, sticky="w")
-            
             ctk.CTkLabel(item_card, text=item["name"], font=ctk.CTkFont(size=self.font_size, weight="bold")).grid(row=0, column=1, padx=(5, 5), pady=5, sticky="w")
-            
-            desc_label = ctk.CTkLabel(item_card, text=f"Description: {item['description']}", font=ctk.CTkFont(size=self.font_size-2), text_color="#A9A9A9", wraplength=400, justify="left")
-            desc_label.grid(row=1, column=1, padx=(5, 5), pady=5, sticky="w")
-            
+            ctk.CTkLabel(item_card, text=f"Description: {item['description']}", font=ctk.CTkFont(size=self.font_size-2), text_color="#A9A9A9").grid(row=1, column=1, padx=(5, 5), pady=5, sticky="w")
             act = ctk.CTkFrame(item_card, corner_radius=0, fg_color="transparent")
             act.grid(row=0, column=2, rowspan=2, padx=(5, 10), pady=5, sticky="e")
             act.grid_columnconfigure((0, 1, 2), weight=1)
-            
             ctk.CTkButton(act, text="View QR", command=lambda i=item['id'], n=item['name']: self.show_qr_code(i, n), width=80, font=ctk.CTkFont(size=self.font_size-2)).grid(row=0, column=0, padx=5, pady=5)
             ctk.CTkButton(act, text="Edit", command=lambda i=item['id']: self.set_edit_mode(i), width=80, font=ctk.CTkFont(size=self.font_size-2)).grid(row=0, column=1, padx=5, pady=5)
             ctk.CTkButton(act, text="Delete", command=lambda i=item['id']: self.delete_item(i), width=80, fg_color="#F44336", hover_color="#D32F2F", font=ctk.CTkFont(size=self.font_size-2)).grid(row=0, column=2, padx=5, pady=5)
