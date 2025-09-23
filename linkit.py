@@ -10,6 +10,7 @@ from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas as pdf_canvas
 from reportlab.lib.utils import ImageReader
 import uuid
+import re
 from reportlab.lib.colors import black, white
 from reportlab.lib.units import inch
 
@@ -386,11 +387,12 @@ class UrlManagerFrame(ctk.CTkFrame):
                 img_buffer = io.BytesIO()
                 img.save(img_buffer, "PNG")
 
-                # Draw QR code
+                # Draw QR code and make it clickable
                 qr_y = y_pos - qr_size
                 c.drawImage(ImageReader(img_buffer), current_x, qr_y, width=qr_size, height=qr_size)
+                c.linkURL(link['url'], (current_x, qr_y, current_x + qr_size, qr_y + qr_size))
 
-                # Draw link name (truncated if too long)
+                # Draw link name (truncated if too long) and make it clickable
                 c.setFont("Helvetica-Bold", 12)
                 name_to_display = link['name']
                 max_width = qr_size
@@ -399,8 +401,9 @@ class UrlManagerFrame(ctk.CTkFrame):
                         name_to_display = name_to_display[:-1]
                     name_to_display += "..."
                 c.drawString(current_x, qr_y - 15, name_to_display)
+                c.linkURL(link['url'], (current_x, qr_y - 15, current_x + c.stringWidth(name_to_display), qr_y - 15 + 12))
 
-                # Draw URL (truncated if too long)
+                # Draw URL (truncated if too long) and make it clickable
                 c.setFont("Helvetica", 8)
                 url_to_display = link['url']
                 if c.stringWidth(url_to_display) > max_width:
@@ -408,6 +411,7 @@ class UrlManagerFrame(ctk.CTkFrame):
                         url_to_display = url_to_display[:-1]
                     url_to_display += "..."
                 c.drawString(current_x, qr_y - 25, url_to_display)
+                c.linkURL(link['url'], (current_x, qr_y - 25, current_x + c.stringWidth(url_to_display), qr_y - 25 + 8))
 
             except Exception as e:
                 tkinter.messagebox.showerror("Error", f"Failed to generate QR for {link['name']}: {e}")
@@ -688,6 +692,11 @@ class InventoryManagerFrame(ctk.CTkFrame):
                         desc_to_display = desc_to_display[:-1]
                     desc_to_display += "..."
                 c.drawString(current_x, qr_y - 25, desc_to_display)
+                
+                # Make name and description clickable, linking to the exported PDF
+                link_target = os.path.abspath(filename)
+                c.linkURL(link_target, (current_x, qr_y - 15, current_x + c.stringWidth(name_to_display), qr_y - 15 + 12))
+                c.linkURL(link_target, (current_x, qr_y - 25, current_x + c.stringWidth(desc_to_display), qr_y - 25 + 8))
 
             except Exception as e:
                 tkinter.messagebox.showerror("Error", f"Failed to generate QR for {item['name']}: {e}")
